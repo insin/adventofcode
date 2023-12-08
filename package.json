@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.10.2"
+  },
+  "dependencies": {
+    "compute-lcm": "^1.1.2"
+  }
+}
