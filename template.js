@@ -23,9 +23,8 @@ let things = inputs
   .map((line, index) => {})
 
 console.log('Part 1')
-let answer
-console.log('answer:', answer)
+console.log('answer:')
 console.log()
 
 console.log('Part 2')
-console.log('answer:', answer)
+console.log('answer:')

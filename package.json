@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node start.js"
+  },
   "devDependencies": {
     "@types/node": "^20.10.2"
   },
