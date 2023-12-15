@@ -1,6 +1,13 @@
 const crypto = require('crypto')
 
 /**
+ * @param {string} data
+ */
+function hash(data) {
+  return crypto.createHash('sha1').update(data).digest('base64')
+}
+
+/**
  * @param {string[][]} grid
  */
 function rotate(grid) {
@@ -18,7 +25,7 @@ function rotate(grid) {
  *
  * @param {string} input
  */
-exports.getGrid = function getGrid(input) {
+function getGrid(input) {
   let cols = rotate(input.split('\n').map((row) => row.split('')))
   return Object.assign(cols, {
     get height() {
@@ -28,10 +35,7 @@ exports.getGrid = function getGrid(input) {
       return cols.length
     },
     hash() {
-      return crypto
-        .createHash('sha1')
-        .update(cols.map((col) => col.join('')).join(''))
-        .digest('base64')
+      return hash(cols.map((col) => col.join('')).join(''))
     },
     print() {
       rotate(cols).forEach((row) => console.log(row.join('')))
@@ -43,7 +47,7 @@ exports.getGrid = function getGrid(input) {
  * @param {number} startOrStop
  * @param {number} [stop]
  */
-exports.range = function range(startOrStop, stop, step = 1) {
+function range(startOrStop, stop, step = 1) {
   if (step == 0) {
     throw new Error('range() step argument must not be 0')
   }
@@ -68,6 +72,14 @@ exports.range = function range(startOrStop, stop, step = 1) {
 /**
  * @param {number[]} nums
  */
-exports.sum = function sum(nums) {
+function sum(nums) {
   return nums.reduce((acc, num) => acc + num, 0)
+}
+
+module.exports = {
+  getGrid,
+  hash,
+  range,
+  rotate,
+  sum,
 }
