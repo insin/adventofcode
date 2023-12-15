@@ -26,43 +26,47 @@ console.log('answer:', sum(steps.map(HASH)))
 console.log()
 
 console.log('Part 2')
-let boxes = Array.from(new Array(256), () => [])
+let boxes = Array.from(new Array(256), () => ({}))
+
+function printBoxes(step) {
+  console.log(`After "${step}":`)
+  for (let [index, box] of boxes.entries()) {
+    if (Object.values(box).length > 0) {
+      console.log(
+        `Box ${index}: ${Object.entries(box)
+          .map(([label, power]) => `[${label} ${power}]`)
+          .join(' ')}`
+      )
+    }
+  }
+  console.log()
+}
+
 for (let step of steps) {
-  let [raw, label, op, power] = step.match(/(\w+)([=-])(\d)?/)
-  let boxIndex = HASH(label)
-  let lensIndex = boxes[boxIndex].findIndex((lens) => lens.label == label)
+  let [_, label, op, power] = step.match(/(\w+)([=-])(\d)?/)
+  let box = boxes[HASH(label)]
   if (op == '-') {
-    if (lensIndex != -1) {
-      boxes[boxIndex].splice(lensIndex, 1)
-    }
+    delete box[label]
   } else {
-    if (lensIndex == -1) {
-      boxes[boxIndex].push({label, power})
-    } else {
-      boxes[boxIndex][lensIndex] = {label, power}
-    }
+    box[label] = Number(power)
   }
   if (debug) {
-    console.log(`After "${raw}":`)
-    for (let [index, box] of boxes.entries()) {
-      if (box.length > 0) {
-        console.log(
-          `Box ${index}: ${box
-            .map(({label, power}) => `[${label} ${power}]`)
-            .join(' ')}`
-        )
-      }
-    }
-    console.log()
+    printBoxes(_)
   }
 }
+
 console.log(
   'answer:',
   sum(
     boxes.map(
       (box, boxIndex) =>
         (boxIndex + 1) *
-        sum(box.map((lens, lensIndex) => (lensIndex + 1) * lens.power))
+        sum(
+          Array.from(
+            Object.values(box),
+            (power, lensIndex) => (lensIndex + 1) * power
+          )
+        )
     )
   )
 )
