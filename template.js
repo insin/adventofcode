@@ -1,4 +1,5 @@
 const fs = require('fs')
+// const {getGrid, range} = require('../../utils')
 let inputs = ['example', 'input'].map((file) =>
   fs.readFileSync(`${file}.txt`, 'utf-8')
 )
