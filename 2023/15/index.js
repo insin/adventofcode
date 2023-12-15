@@ -11,9 +11,7 @@ let steps = inputs.at(process.argv[2] == 'test' ? 0 : -1).split(',')
 function HASH(s) {
   let currentValue = 0
   for (let i = 0; i < s.length; i++) {
-    currentValue += s.charCodeAt(i)
-    currentValue *= 17
-    currentValue %= 256
+    currentValue = ((currentValue + s.charCodeAt(i)) * 17) % 256
   }
   return currentValue
 }
@@ -55,18 +53,7 @@ for (let step of steps) {
   }
 }
 
-console.log(
-  'answer:',
-  sum(
-    boxes.map(
-      (box, boxIndex) =>
-        (boxIndex + 1) *
-        sum(
-          Array.from(
-            Object.values(box),
-            (power, lensIndex) => (lensIndex + 1) * power
-          )
-        )
-    )
-  )
-)
+// prettier-ignore
+console.log('answer:', sum(boxes.map((box, i) =>
+  (i + 1) * sum(Object.values(box).map((power, i) => (i + 1) * power))
+)))
