@@ -58,13 +58,20 @@ exports.getGrid = function getGrid(input) {
   return {rows, cols, rowStrings, colStrings, grid}
 }
 
-exports.range = function range(start, stop, step) {
+/**
+ * @param {number} startOrStop
+ * @param {number} [stop]
+ * @returns {number[]}
+ */
+exports.range = function range(startOrStop, stop, step = 1) {
+  if (step == 0) {
+    throw new Error('range() step argument must not be 0')
+  }
+
+  let start = startOrStop
   if (typeof stop == 'undefined') {
     stop = start
     start = 0
-  }
-  if (typeof step == 'undefined') {
-    step = 1
   }
 
   if ((step > 0 && start >= stop) || (step < 0 && start <= stop)) {
@@ -72,8 +79,15 @@ exports.range = function range(start, stop, step) {
   }
 
   let result = []
-  for (var i = start; step > 0 ? i < stop : i > stop; i += step) {
+  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
     result.push(i)
   }
   return result
+}
+
+/**
+ * @param {number[]} nums
+ */
+exports.sum = function sum(nums) {
+  return nums.reduce((acc, num) => acc + num, 0)
 }

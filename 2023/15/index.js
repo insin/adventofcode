@@ -1,4 +1,5 @@
 const fs = require('fs')
+const {sum} = require('../../utils')
 let inputs = ['example', 'input'].map((file) =>
   fs.readFileSync(`${file}.txt`, 'utf-8')
 )
@@ -21,11 +22,47 @@ console.log('Part 1')
 if (debug) {
   console.log('HASH(HASH)', '=', HASH('HASH'))
 }
-console.log(
-  'answer:',
-  steps.reduce((acc, step) => acc + HASH(step), 0)
-)
+console.log('answer:', sum(steps.map(HASH)))
 console.log()
 
 console.log('Part 2')
-console.log('answer:')
+let boxes = Array.from(new Array(256), () => [])
+for (let step of steps) {
+  let [raw, label, op, power] = step.match(/(\w+)([=-])(\d)?/)
+  let boxIndex = HASH(label)
+  let lensIndex = boxes[boxIndex].findIndex((lens) => lens.label == label)
+  if (op == '-') {
+    if (lensIndex != -1) {
+      boxes[boxIndex].splice(lensIndex, 1)
+    }
+  } else {
+    if (lensIndex == -1) {
+      boxes[boxIndex].push({label, power})
+    } else {
+      boxes[boxIndex][lensIndex] = {label, power}
+    }
+  }
+  if (debug) {
+    console.log(`After "${raw}":`)
+    for (let [index, box] of boxes.entries()) {
+      if (box.length > 0) {
+        console.log(
+          `Box ${index}: ${box
+            .map(({label, power}) => `[${label} ${power}]`)
+            .join(' ')}`
+        )
+      }
+    }
+    console.log()
+  }
+}
+console.log(
+  'answer:',
+  sum(
+    boxes.map(
+      (box, boxIndex) =>
+        (boxIndex + 1) *
+        sum(box.map((lens, lensIndex) => (lensIndex + 1) * lens.power))
+    )
+  )
+)
