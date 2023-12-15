@@ -102,7 +102,7 @@ console.log()
  * @returns {Line}
  */
 function expand([row, sizes]) {
-  return [new Array(5).fill(row).join('?'), new Array(5).fill(sizes).flat()]
+  return [Array(5).fill(row).join('?'), Array(5).fill(sizes).flat()]
 }
 
 console.log('Part 2')

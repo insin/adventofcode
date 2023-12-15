@@ -23,7 +23,7 @@ let patterns = inputs
   .split('\n\n')
   .map((pattern) => {
     let rows = pattern.split('\n')
-    let columns = Array.from(new Array(rows[0].length), (_, colIndex) =>
+    let columns = Array.from(Array(rows[0].length), (_, colIndex) =>
       rows.map((row) => row.charAt(colIndex)).join('')
     )
     return [rows, columns]

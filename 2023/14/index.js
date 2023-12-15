@@ -6,7 +6,7 @@ let inputs = ['example', 'input'].map((file) =>
 
 let debug = process.argv[2] != null
 
-let {grid} = getGrid(inputs.at(process.argv[2] == 'test' ? 0 : -1))
+let grid = getGrid(inputs.at(process.argv[2] == 'test' ? 0 : -1))
 
 console.log('Part 1')
 
@@ -128,7 +128,7 @@ function nextCycle() {
           cycleCount,
           'last seen',
           cycleCount - lastSeen.get(hash),
-          ' ago',
+          'ago',
           {firstLoop}
         )
       }

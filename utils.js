@@ -1,67 +1,47 @@
 const crypto = require('crypto')
 
 /**
- * @param {string[][]} cols
- * @return {string[][]}
+ * @param {string[][]} grid
  */
-function colsToRows(cols) {
-  return Array.from(new Array(cols[0].length), (_, rowIndex) =>
-    cols.map((col) => col[rowIndex])
+function rotate(grid) {
+  return Array.from(Array(grid[0].length), (_, index) =>
+    grid.map((items) => items[index])
   )
 }
 
 /**
- * Create a grid from an input string in the format:
+ * Create a grid from a string in the format:
  *
  * 123
  * 456
  * 789
  *
  * @param {string} input
- * @returns {{
- *   cols: string[][]
- *   colStrings: string[]
- *   rows: string[][]
- *   rowStrings: string[]
- *   grid: string[][] & {width: number, height: number, print: () => void, hash() => string}
- * }}
  */
 exports.getGrid = function getGrid(input) {
-  let rowStrings = input.split('\n')
-  let rows = rowStrings.map((rowString) => rowString.split(''))
-  let cols = Array.from(new Array(rowStrings[0].length), (_, colIndex) =>
-    rowStrings.map((row) => row.charAt(colIndex))
-  )
-  let grid = Object.assign(
-    cols.map((col) => col.slice()),
-    {
-      height: rows.length,
-      width: cols.length,
-      /**
-       * @this {string[][]}
-       */
-      hash() {
-        return crypto
-          .createHash('sha1')
-          .update(this.map((col) => col.join('')).join(''))
-          .digest('base64')
-      },
-      /**
-       * @this {string[][]}
-       */
-      print() {
-        colsToRows(this).forEach((row) => console.log(row.join('')))
-      },
-    }
-  )
-  let colStrings = cols.map((col) => col.join(''))
-  return {rows, cols, rowStrings, colStrings, grid}
+  let cols = rotate(input.split('\n').map((row) => row.split('')))
+  return Object.assign(cols, {
+    get height() {
+      return cols[0].length
+    },
+    get width() {
+      return cols.length
+    },
+    hash() {
+      return crypto
+        .createHash('sha1')
+        .update(cols.map((col) => col.join('')).join(''))
+        .digest('base64')
+    },
+    print() {
+      rotate(cols).forEach((row) => console.log(row.join('')))
+    },
+  })
 }
 
 /**
  * @param {number} startOrStop
  * @param {number} [stop]
- * @returns {number[]}
  */
 exports.range = function range(startOrStop, stop, step = 1) {
   if (step == 0) {

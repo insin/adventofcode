@@ -26,7 +26,7 @@ console.log('answer:', sum(steps.map(HASH)))
 console.log()
 
 console.log('Part 2')
-let boxes = Array.from(new Array(256), () => ({}))
+let boxes = Array.from(Array(256), () => ({}))
 
 function printBoxes(step) {
   console.log(`After "${step}":`)
