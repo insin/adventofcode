@@ -25,8 +25,13 @@ function rotate(grid) {
  *
  * @param {string} input
  */
-function getGrid(input) {
-  let cols = rotate(input.split('\n').map((row) => row.split('')))
+function getGrid(input, mapItem = (item) => item) {
+  let cols = rotate(
+    input
+      .split('\n')
+      .map((row) => row.split(''))
+      .map(mapItem)
+  )
   return Object.assign(cols, {
     get height() {
       return cols[0].length

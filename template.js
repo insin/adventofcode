@@ -23,8 +23,10 @@ let things = inputs
   .map((line, index) => {})
 
 console.log('Part 1')
+// prettier-ignore
 console.log('answer:')
 console.log()
 
 console.log('Part 2')
+// prettier-ignore
 console.log('answer:')
