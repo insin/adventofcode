@@ -148,8 +148,9 @@ let realPlans = plans.map(({color}) => {
   return {dir, length: parseInt(hex.join(''), 16)}
 })
 
-function getPoints(plans, {start}) {
-  let [x, y] = start
+function getPoints(plans) {
+  let x = 0
+  let y = 0
   let points = []
   for (let {dir, length} of plans) {
     switch (dir) {
@@ -184,8 +185,7 @@ function getArea(points) {
   return Math.abs(total)
 }
 
-let realDimensions = getDimensions(realPlans)
-let points = getPoints(realPlans, realDimensions)
+let points = getPoints(realPlans)
 let realArea = getArea(points)
 // TIL this is Pick's formula - I brute-forced it based on the delta from the
 // example answer.
