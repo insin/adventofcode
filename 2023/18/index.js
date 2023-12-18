@@ -187,6 +187,7 @@ function getArea(points) {
 let realDimensions = getDimensions(realPlans)
 let points = getPoints(realPlans, realDimensions)
 let realArea = getArea(points)
-// NGL, magic numbered this based on the example answer
-let perimeter = (sum(realPlans.map((plan) => plan.length)) + 2) / 2
+// TIL this is Pick's formula - I brute-forced it based on the delta from the
+// example answer.
+let perimeter = sum(realPlans.map((plan) => plan.length)) / 2 + 1
 console.log('answer:', realArea + perimeter)
