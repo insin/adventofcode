@@ -1,124 +1,118 @@
+/**
+ * Another learning day today - this time for Djikstra!
+ *
+ * My initial attempt had many of the right small pieces like figuring out
+ * possible next directons, but it was DFS recursion which never seemed to
+ * finish.
+ *
+ * The main parts I was missing were storing the lowest total hear loss seen
+ * separately from the moves and using that to chop down which paths we keep
+ * looking at in a BFS fashion. I used this solution as a reference:
+ *
+ * https://gist.github.com/knutel/275c3eb088b0359ed058dfb56a9d9896
+ */
 const fs = require('fs')
-const {getGrid, hash, range, rotate, sum} = require('../../utils')
+const {getGrid} = require('../../utils')
 let inputs = ['example', 'input'].map((file) =>
   fs.readFileSync(`${file}.txt`, 'utf-8')
 )
 
-let debug = process.argv[2] != null
-let grid = getGrid(inputs.at(process.argv[2] == 'test' ? 0 : -1), Number)
-let cache = new Map()
-
-// corrent position
-// current direction
-// number of moves in current direction
-// cost so far
-
-// valid next moves:
-// left (if in bounds and not visited before)
-// right (if in bounds and not visited before)
-// straight (if in bounds and not moved 3 yet
-
-let deltas = {
-  '>': {dx: 1},
-  '<': {dx: -1},
-  '^': {dy: -1},
-  v: {dy: 1},
-}
-
-function outside(x, y) {
-  return x < 0 || x == grid.width || y < 0 || y == grid.height
-}
-
-function findShortestPath(
-  x, y,
-  dir,
-  length,
-  visited,
-  stepsInCurrentDirection = 1
-) {
-  let possibleDirections = dir == '>' || dir == '<' ? ['^', 'v'] : ['>', '<']
-  if (stepsInCurrentDirection < 3) {
-    possibleDirections.push(dir)
-  }
-  let nextMoves = possibleDirections.map(possibleDir => {
-    let {dx = 0, dy = 0} = deltas[possibleDir]
-    if (!outside(x + dx, y + dy) && !visited.has(`${x + dx},${y + dy}`)) {
-      return [x + dx, y + dy, possibleDir]
-    }
-  }).filter(Boolean)
-
-  if (nextMoves.length == 0) return null
-
-  if (nextMoves.find(([x, y]) => x == grid.width - 1 && y == grid.height -1)) {
-    return length + grid[grid.width - 1][grid.height - 1]
-  }
-
-  let pathLengths = nextMoves.map(([nextX, nextY, nextDir] =>
-    findShortestPath(nextX, nextY, nextDir) // XX
-  )
-  for (let [nextX, nextY, nextDir] of nextMoves) {
-    return Math.min(
-      ...
-    )
-  }
-}
-
-findShortestPath([1, 0], '>', grid[1][0], new Set(['1,0']), 1)
-findShortestPath([0, 1], 'v', grid[0][1], new Set(['0,1']), 1)
+let grid = getGrid(inputs.at(process.argv[2] == 'test' ? 0 : -1))
 
 /**
- * @param {string} row
- * @param {number[]} sizes
- * @param {number} numberInCurrentGroup
- * @returns {number}
+ * @param {[number, number]} pos
+ * @param {[number, number]} delta
  */
-function countSolutions(row, sizes, numberInCurrentGroup = 0) {
-  let key = [row, sizes.join(','), numberInCurrentGroup].join('|')
-  if (cache.has(key)) return cache.get(key)
+function add(pos, delta) {
+  return [pos[0] + delta[0], pos[1] + delta[1]]
+}
 
-  // Once all characters have been consumed, check if all groups are finished
-  if (row == '') {
-    let valid =
-      // All groups were finished before the last character
-      (sizes.length == 0 && numberInCurrentGroup == 0) ||
-      // The last character finished the remaining group
-      (sizes.length == 1 && numberInCurrentGroup == sizes[0])
-    cache.set(key, valid ? 1 : 0)
-    return cache.get(key)
-  }
+let deltas = {
+  '>': [1, 0],
+  '<': [-1, 0],
+  '^': [0, -1],
+  v: [0, 1],
+}
 
-  let count = 0
-  // Every time we hit a ?, try # or . in its place instead
-  let next = row.charAt(0) == '?' ? ['#', '.'] : [row.charAt(0)]
-  for (let char of next) {
-    if (char == '#') {
-      // Start a new group or extend the current group
-      count += countSolutions(row.slice(1), sizes, numberInCurrentGroup + 1)
-    } else {
-      // If we're currently in a group
-      if (numberInCurrentGroup > 0) {
-        // Finish the group if we've reached its size
-        if (sizes.length > 0 && sizes[0] == numberInCurrentGroup) {
-          count += countSolutions(row.slice(1), sizes.slice(1))
+let key = (x, y, dir, stepsInCurrentDirection) =>
+  [x, y, dir, stepsInCurrentDirection].join(',')
+
+/** @typedef {[[number, number], string, number]} Move */
+
+function getHeatLosses(getPossibleDirs) {
+  /** @type {Move[]} */
+  let moves = [
+    [[1, 0], '>', 1],
+    [[0, 1], 'v', 1],
+  ]
+  let heatLoss = new Map([
+    [key(1, 0, '>', 1), Number(grid.at([1, 0]))],
+    [key(0, 1, 'v', 1), Number(grid.at([0, 1]))],
+  ])
+  while (moves.length > 0) {
+    /** @type {Move[]} */
+    let nextMoves = []
+    for (let move of moves) {
+      let [[x, y], dir, stepsInCurrentDirection] = move
+      for (let nextDir of getPossibleDirs(dir, stepsInCurrentDirection)) {
+        let [nextX, nextY] = add([x, y], deltas[nextDir])
+        if (!grid.contains([nextX, nextY])) {
+          continue
         }
-        // Otherwise, the solution we were checking is invalid - no more
-        // characters will be checked, as we fall through to return, without
-        // having added anything to the valid count.
-      } else {
-        // Move on to the next character
-        count += countSolutions(row.slice(1), sizes)
+        let nextSteps = nextDir == dir ? stepsInCurrentDirection + 1 : 1
+        let nextKey = key(nextX, nextY, nextDir, nextSteps)
+        let nextHeatLoss =
+          heatLoss.get(key(x, y, dir, stepsInCurrentDirection)) +
+          Number(grid.at([nextX, nextY]))
+        if (!heatLoss.has(nextKey) || nextHeatLoss < heatLoss.get(nextKey)) {
+          heatLoss.set(nextKey, nextHeatLoss)
+          nextMoves.push([[nextX, nextY], nextDir, nextSteps])
+        }
       }
     }
+    moves = nextMoves
   }
-  cache.set(key, count)
-  return count
+  return heatLoss
 }
 
 console.log('Part 1')
-// prettier-ignore
-console.log('answer:')
+let heatLoss1 = getHeatLosses((dir, stepsInCurrentDirection) => {
+  let dirs = dir == '>' || dir == '<' ? ['v', '^'] : ['>', '<']
+  if (stepsInCurrentDirection < 3) {
+    dirs.unshift(dir)
+  }
+  return dirs
+})
+console.log(
+  'answer:',
+  Math.min(
+    ...[...heatLoss1.keys()]
+      .filter((key) => key.startsWith(`${grid.width - 1},${grid.height - 1}`))
+      .map((key) => heatLoss1.get(key))
+  )
+)
 console.log()
 
 console.log('Part 2')
-// prettier-ignore
-console.log('answer:')
+let heatLoss2 = getHeatLosses((dir, stepsInCurrentDirection) => {
+  if (stepsInCurrentDirection < 4) {
+    return [dir]
+  }
+  let dirs = dir == '>' || dir == '<' ? ['v', '^'] : ['>', '<']
+  if (stepsInCurrentDirection < 10) {
+    dirs.unshift(dir)
+  }
+  return dirs
+})
+console.log(
+  'answer:',
+  Math.min(
+    ...[...heatLoss2.keys()]
+      .filter(
+        (key) =>
+          key.startsWith(`${grid.width - 1},${grid.height - 1}`) &&
+          Number(key.split(',').at(-1)) >= 4
+      )
+      .map((key) => heatLoss2.get(key))
+  )
+)

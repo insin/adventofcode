@@ -25,19 +25,34 @@ function rotate(grid) {
  *
  * @param {string} input
  */
-function getGrid(input, mapItem = (item) => item) {
-  let cols = rotate(
-    input
-      .split('\n')
-      .map((row) => row.split(''))
-      .map(mapItem)
-  )
+function getGrid(input) {
+  let cols = rotate(input.split('\n').map((row) => row.split('')))
+  let width = cols.length
+  let height = cols[0].length
   return Object.assign(cols, {
     get height() {
-      return cols[0].length
+      return height
     },
     get width() {
-      return cols.length
+      return width
+    },
+    /**
+     * @param {[number, number]} pos
+     */
+    at([x, y]) {
+      return cols[x][y]
+    },
+    /**
+     * @param {[number, number]} pos
+     */
+    contains([x, y]) {
+      return x >= 0 && x < width && y >= 0 && y < height
+    },
+    /**
+     * @param {[number, number]} pos
+     */
+    outside(pos) {
+      return !this.contains(pos)
     },
     hash() {
       return hash(cols.map((col) => col.join('')).join(''))
