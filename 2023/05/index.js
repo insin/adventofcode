@@ -1,44 +1,8 @@
 const fs = require('fs')
+let {Range} = require('../../utils')
 let inputs = ['example', 'input'].map((file) =>
   fs.readFileSync(`${file}.txt`, 'utf-8')
 )
-
-class Range {
-  /**
-   * @param {number} start
-   * @param {number} end
-   */
-  constructor(start, end) {
-    this.start = start
-    this.end = end
-  }
-
-  get length() {
-    return this.end - this.start + 1
-  }
-
-  /**
-   * @param {number} num
-   * @returns {boolean}
-   */
-  includes(num) {
-    return num >= this.start && num <= this.end
-  }
-
-  /**
-   * @param {Range} range
-   * @returns {Range | null}
-   */
-  intersection(range) {
-    if (this.start <= range.end && this.end >= range.start) {
-      return new Range(
-        Math.max(this.start, range.start),
-        Math.min(this.end, range.end)
-      )
-    }
-    return null
-  }
-}
 
 /**
  * @typedef {{

@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const util = require('util')
 
 /**
  * @param {string} data
@@ -89,6 +90,51 @@ function range(startOrStop, stop, step = 1) {
   return result
 }
 
+class Range {
+  /**
+   * @param {number} start
+   * @param {number} end
+   */
+  constructor(start, end) {
+    this.start = start
+    this.end = end
+  }
+
+  get length() {
+    return this.end - this.start + 1
+  }
+
+  /**
+   * @param {number} num
+   * @returns {boolean}
+   */
+  includes(num) {
+    return num >= this.start && num <= this.end
+  }
+
+  /**
+   * @param {Range} range
+   * @returns {Range | null}
+   */
+  intersection(range) {
+    if (this.start <= range.end && this.end >= range.start) {
+      return new Range(
+        Math.max(this.start, range.start),
+        Math.min(this.end, range.end)
+      )
+    }
+    return null
+  }
+
+  toString() {
+    return `${this.start}..${this.end}`
+  }
+
+  [util.inspect.custom]() {
+    return this.toString()
+  }
+}
+
 /**
  * @param {number[]} nums
  */
@@ -100,6 +146,7 @@ module.exports = {
   getGrid,
   hash,
   range,
+  Range,
   rotate,
   sum,
 }
