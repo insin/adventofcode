@@ -6,8 +6,6 @@ let inputs = ['example1', 'example2', 'input'].map((file) =>
 )
 
 /**
- * @typedef {{from: string, to: string, pulse: 'high' | 'low'}} Message
- *
  * @typedef {{
  *   type: 'broadcaster'
  *   name: 'broadcaster'
@@ -27,7 +25,7 @@ let inputs = ['example1', 'example2', 'input'].map((file) =>
  *   name: string
  *   inputs: string[]
  *   outputs: string[]
- *   state: Map<string, 'high' | 'low'>
+ *   state: Map<string, string>
  * }} Conjunction
  */
 
@@ -36,125 +34,107 @@ let debug = process.argv[2] != null
 const FLIP_FLOP = '%'
 const CONJUNCTION = '&'
 
-/** @type {Map<string, Broadcaster | Conjunction | FlipFlop>} */
+/** @type {Array<Broadcaster | Conjunction | FlipFlop>} */
 let modules
+/** @type {Map<string, Broadcaster | Conjunction | FlipFlop>} */
+let modulesMap
 
 function resetModules() {
-  modules = new Map(
-    inputs
-      .at(process.argv[2] == 'test' ? 1 : -1)
-      .split('\n')
-      .map((line) => {
-        let [name, outputs] = line.split(' -> ')
-        if (name == 'broadcaster') {
-          return [
-            name,
-            {
-              type: 'broadcaster',
-              name: 'broadcaster',
-              outputs: outputs.split(', '),
-            },
-          ]
-        } else if (name.charAt(0) == FLIP_FLOP) {
-          return [
-            name.substring(1),
-            {
-              type: '%',
-              name: name.substring(1),
-              inputs: [],
-              outputs: outputs.split(', '),
-              state: 'off',
-            },
-          ]
-        } else if (name.charAt(0) == CONJUNCTION) {
-          return [
-            name.substring(1),
-            {
-              type: '&',
-              name: name.substring(1),
-              inputs: [],
-              outputs: outputs.split(', '),
-              state: new Map(),
-            },
-          ]
+  modules = inputs
+    .at(process.argv[2] == 'test' ? 1 : -1)
+    .split('\n')
+    .map((line) => {
+      let [name, outputs] = line.split(' -> ')
+      if (name == 'broadcaster') {
+        return {
+          type: 'broadcaster',
+          name: 'broadcaster',
+          outputs: outputs.split(', '),
         }
-      })
-  )
+      } else if (name.charAt(0) == FLIP_FLOP) {
+        return {
+          type: '%',
+          name: name.substring(1),
+          inputs: [],
+          outputs: outputs.split(', '),
+          state: 'off',
+        }
+      } else if (name.charAt(0) == CONJUNCTION) {
+        return {
+          type: '&',
+          name: name.substring(1),
+          inputs: [],
+          outputs: outputs.split(', '),
+          state: new Map(),
+        }
+      }
+    })
 
-  // Connect modules to their inputs and initialise conjunction state
-  modules.forEach((module) => {
-    if (module.type == FLIP_FLOP || module.type == CONJUNCTION) {
-      // prettier-ignore
-      module.inputs = [...modules.values()].filter((from) =>
-        from.name != module.name && from.outputs.includes(module.name)
-      ).map((from) => from.name)
+  // Let modules know about their inputs and initialise conjunction state
+  for (let mod of modules) {
+    if (mod.type == FLIP_FLOP || mod.type == CONJUNCTION) {
+      mod.inputs = modules
+        .filter((from) => from.outputs.includes(mod.name))
+        .map((from) => from.name)
     }
-    if (module.type == CONJUNCTION) {
-      module.state = new Map(module.inputs.map((input) => [input, 'low']))
+    if (mod.type == CONJUNCTION) {
+      mod.state = new Map(mod.inputs.map((input) => [input, 'low']))
     }
-  })
+  }
+
+  modulesMap = new Map(modules.map((mod) => [mod.name, mod]))
 }
 
 function pushButton(pushCount = null, lowPulseConjunctions = null) {
-  /** @type {Message[]} */
   let messages = [{from: 'button', to: 'broadcaster', pulse: 'low'}]
   let low = 0
   let high = 0
   while (messages.length > 0) {
     let message = messages.shift()
-    if (debug) {
-      console.log(`${message.from} -${message.pulse}-> ${message.to}`)
-    }
     if (message.pulse == 'low') {
       low++
     } else {
       high++
     }
-
-    let module = modules.get(message.to)
-    if (!module) {
-      continue
+    if (debug) {
+      console.log(`${message.from} -${message.pulse}-> ${message.to}`)
     }
 
-    if (module.type == 'broadcaster') {
-      messages.push(
-        ...module.outputs.map((to) => ({
-          from: module.name,
-          to,
-          pulse: message.pulse,
-        }))
-      )
-    } else if (module.type == FLIP_FLOP) {
+    let mod = modulesMap.get(message.to)
+    if (!mod) continue
+
+    let nextPulse
+    if (mod.type == 'broadcaster') {
+      nextPulse = message.pulse
+    } else if (mod.type == FLIP_FLOP) {
       if (message.pulse == 'low') {
-        module.state = module.state == 'off' ? 'on' : 'off'
-        messages.push(
-          ...module.outputs.map((to) => ({
-            from: module.name,
-            to,
-            pulse: module.state == 'on' ? 'high' : 'low',
-          }))
-        )
+        mod.state = mod.state == 'off' ? 'on' : 'off'
+        nextPulse = mod.state == 'on' ? 'high' : 'low'
       }
-    } else if (module.type == CONJUNCTION) {
-      module.state.set(message.from, message.pulse)
-      let pulse = [...module.state.values()].every((pulse) => pulse == 'high')
+    } else if (mod.type == CONJUNCTION) {
+      mod.state.set(message.from, message.pulse)
+      nextPulse = [...mod.state.values()].every((pulse) => pulse == 'high')
         ? 'low'
         : 'high'
-      messages.push(
-        ...module.outputs.map((to) => ({
-          from: module.name,
-          to,
-          pulse,
-        }))
-      )
       // For part 2
       if (
-        lowPulseConjunctions?.has(module.name) &&
-        lowPulseConjunctions.get(module.name) == null &&
-        pulse == 'low'
+        nextPulse == 'low' &&
+        lowPulseConjunctions &&
+        lowPulseConjunctions.has(mod.name) &&
+        lowPulseConjunctions.get(mod.name) == null
       ) {
-        lowPulseConjunctions.set(module.name, pushCount)
+        lowPulseConjunctions.set(mod.name, pushCount)
       }
+    }
+
+    if (nextPulse) {
+      messages.push(
+        ...mod.outputs.map((to) => ({
+          from: mod.name,
+          to,
+          pulse: nextPulse,
+        }))
+      )
     }
   }
   // Fpr part 1
@@ -166,11 +146,11 @@ console.log('Part 1')
 // example answers - cheekily, the actual input will not loop within 1,000
 // button presses.
 function originalStateReached() {
-  for (let module of modules.values()) {
-    if (module.type == FLIP_FLOP) {
-      if (module.state != 'off') return false
-    } else if (module.type == CONJUNCTION) {
-      if (![...module.state.values()].every((pulse) => pulse == 'low'))
+  for (let mod of modules) {
+    if (mod.type == FLIP_FLOP) {
+      if (mod.state != 'off') return false
+    } else if (mod.type == CONJUNCTION) {
+      if (![...mod.state.values()].every((pulse) => pulse == 'low'))
         return false
     }
   }
@@ -210,13 +190,11 @@ if (process.argv[2] == 'test') {
 // Basd on inspection of the puzze input, following inputs and outputs from rx
 // upwards leads to a number of conjunctions which all need to send a low pulse
 // at the same time for rx to receive one.
-let modulesList = [...modules.values()]
-// prettier-ignore
-let conjunctionNames = modulesList
-  .find((module) => module.outputs?.includes('rx'))
-  .inputs
-  .map((name) => modulesList.find((module) => module.outputs.includes(name)))
-  .map((module) => module.name)
+let conjunctionNames = modules
+  .find((mod) => mod.outputs.includes('rx'))
+  // @ts-ignore
+  .inputs.map((name) => modules.find((mod) => mod.outputs.includes(name)))
+  .map((mod) => mod.name)
 let lowPulseConjunctions = new Map(conjunctionNames.map((name) => [name, null]))
 
 resetModules()
