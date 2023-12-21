@@ -2,6 +2,15 @@ const crypto = require('crypto')
 const util = require('util')
 
 /**
+ * @param {[number, number]} pos
+ * @param {[number, number]} delta
+ * @returns {[number, number]}
+ */
+function add(pos, delta) {
+  return [pos[0] + delta[0], pos[1] + delta[1]]
+}
+
+/**
  * @param {string} data
  */
 function hash(data) {
@@ -48,6 +57,17 @@ function getGrid(input) {
      */
     contains([x, y]) {
       return x >= 0 && x < width && y >= 0 && y < height
+    },
+    /**
+     * @param {string} item
+     * @returns {[number, number]}
+     */
+    findItem(item) {
+      for (let [x, row] of cols.entries()) {
+        let y = row.indexOf(item)
+        if (y != -1) return [x, y]
+      }
+      return null
     },
     /**
      * @param {[number, number]} pos
@@ -143,6 +163,7 @@ function sum(nums) {
 }
 
 module.exports = {
+  add,
   getGrid,
   hash,
   range,
