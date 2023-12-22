@@ -125,6 +125,18 @@ class Range {
   }
 
   /**
+   * @param {number} delta
+   */
+  add(delta) {
+    this.start += delta
+    this.end += delta
+  }
+
+  clone() {
+    return new Range(this.start, this.end)
+  }
+
+  /**
    * @param {number} num
    * @returns {boolean}
    */
