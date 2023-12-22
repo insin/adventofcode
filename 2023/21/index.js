@@ -90,7 +90,7 @@ function part2() {
     }
   } while (sampleCounts.length < sampleCountTarget)
 
-  // Copted from day 9!
+  // Copied from day 9!
   let current = sampleCounts
   let seqs = [current]
   do {

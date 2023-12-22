@@ -5,8 +5,8 @@
  * possible next directons, but it was DFS recursion which never seemed to
  * finish.
  *
- * The main parts I was missing were storing the lowest total hear loss seen
- * separately from the moves and using that to chop down which paths we keep
+ * The main parts I was missing were storing the lowest total heat loss seen
+ * separately from the moves, and using that to chop down which paths we keep
  * looking at in a BFS fashion. I used this solution as a reference:
  *
  * https://gist.github.com/knutel/275c3eb088b0359ed058dfb56a9d9896
