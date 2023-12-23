@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {add, getGrid} = require('../../utils')
+const {add, dirs, getGrid, oppositeDirs} = require('../../utils')
 let inputs = ['example', 'input'].map((file) =>
   fs.readFileSync(`${file}.txt`, 'utf-8')
 )
@@ -7,23 +7,6 @@ let inputs = ['example', 'input'].map((file) =>
 let debug = process.argv[2] != null
 
 let grid = getGrid(inputs.at(process.argv[2] == 'test' ? 0 : -1))
-
-/**
- * @type {Record<string, [number, number]>}
- */
-let dirs = {
-  ['^']: [0, -1],
-  ['>']: [1, 0],
-  ['v']: [0, 1],
-  ['<']: [-1, 0],
-}
-
-let oppositeDirs = {
-  ['^']: 'v',
-  ['>']: '<',
-  ['v']: '^',
-  ['<']: '>',
-}
 
 let key = ([x, y], dir) => [x, y, dir].join(',')
 

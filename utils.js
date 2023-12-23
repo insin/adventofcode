@@ -1,6 +1,21 @@
 const crypto = require('crypto')
 const util = require('util')
 
+/** @type {Record<string, [number, number]>} */
+const dirs = {
+  ['^']: [0, -1],
+  ['>']: [1, 0],
+  ['v']: [0, 1],
+  ['<']: [-1, 0],
+}
+
+const oppositeDirs = {
+  ['^']: 'v',
+  ['>']: '<',
+  ['v']: '^',
+  ['<']: '>',
+}
+
 /**
  * @param {[number, number]} pos
  * @param {[number, number]} delta
@@ -175,11 +190,13 @@ function sum(nums) {
 }
 
 module.exports = {
+  Range,
   add,
+  dirs,
   getGrid,
   hash,
+  oppositeDirs,
   range,
-  Range,
   rotate,
   sum,
 }
