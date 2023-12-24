@@ -47,4 +47,38 @@ console.log('answer:', total)
 console.log()
 
 console.log('Part 2')
-console.log('answer:')
+// Never heard of Z3 before, this is from someone else's solution
+let {init} = require('z3-solver')
+void (async function () {
+  let {Context} = await init()
+  let Z3 = Context('main')
+  let x = Z3.Real.const('x')
+  let y = Z3.Real.const('y')
+  let z = Z3.Real.const('z')
+  let vx = Z3.Real.const('vx')
+  let vy = Z3.Real.const('vy')
+  let vz = Z3.Real.const('vz')
+  let solver = new Z3.Solver()
+
+  for (let i = 0; i < 3; i++) {
+    let stone = hailstones[i]
+    let t = Z3.Real.const(`t${i}`)
+
+    solver.add(t.ge(0))
+    solver.add(x.add(vx.mul(t)).eq(t.mul(stone[3]).add(stone[0])))
+    solver.add(y.add(vy.mul(t)).eq(t.mul(stone[4]).add(stone[1])))
+    solver.add(z.add(vz.mul(t)).eq(t.mul(stone[5]).add(stone[2])))
+  }
+
+  let isSat = await solver.check()
+  if (isSat != 'sat') {
+    console.log('not satisfied')
+    return
+  }
+
+  let model = solver.model()
+  let rx = Number(model.eval(x))
+  let ry = Number(model.eval(y))
+  let rz = Number(model.eval(z))
+  console.log('answer:', rx + ry + rz)
+})()

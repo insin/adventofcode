@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "checkJs": true,
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "nodenext",
     "target": "ES2022",
-    "moduleDetection": "force"
   }
 }

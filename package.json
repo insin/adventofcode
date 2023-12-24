@@ -6,6 +6,7 @@
     "@types/node": "^20.10.2"
   },
   "dependencies": {
-    "compute-lcm": "^1.1.2"
+    "compute-lcm": "^1.1.2",
+    "z3-solver": "^4.12.4"
   }
 }
