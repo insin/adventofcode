@@ -1,4 +1,5 @@
 const fs = require('fs')
+const {uniquePairs} = require('../../utils')
 let inputs = ['example', 'input'].map((file) =>
   fs.readFileSync(`${file}.txt`, 'utf-8')
 )
@@ -42,14 +43,6 @@ function getGalaxies(expansionSize) {
 
 function shortestPath(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y)
-}
-
-function uniquePairs(list) {
-  if (list.length < 2) return []
-  let head = list[0]
-  let tail = list.slice(1)
-  let pairs = tail.map((item) => [head, item])
-  return pairs.concat(uniquePairs(tail))
 }
 
 console.log('Part 1')

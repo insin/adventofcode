@@ -189,6 +189,14 @@ function sum(nums) {
   return nums.reduce((acc, num) => acc + num, 0)
 }
 
+function uniquePairs(list) {
+  if (list.length < 2) return []
+  let head = list[0]
+  let tail = list.slice(1)
+  let pairs = tail.map((item) => [head, item])
+  return pairs.concat(uniquePairs(tail))
+}
+
 module.exports = {
   Range,
   add,
@@ -199,4 +207,5 @@ module.exports = {
   range,
   rotate,
   sum,
+  uniquePairs,
 }
