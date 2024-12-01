@@ -6,10 +6,12 @@ let inputs = ['example', 'input'].map((file) =>
 let lines = inputs.at(process.argv[2] == 'test' ? 0 : -1).split('\n')
 let left = []
 let right = []
+let rightCount = {}
 for (let line of lines) {
-  let [one, two] = line.split('  ').map((n) => Number(n))
-  left.push(one)
-  right.push(two)
+  let [ln, rn] = line.split('  ').map((n) => Number(n))
+  left.push(ln)
+  right.push(rn)
+  rightCount[rn] = (rightCount[rn] ?? 0) + 1
 }
 left.sort()
 right.sort()
@@ -24,10 +26,6 @@ console.log('answer:', answer1)
 console.log()
 
 console.log('Part 2')
-let rightCount = {}
-for (let rn of right) {
-  rightCount[rn] = (rightCount[rn] ?? 0) + 1
-}
 let answer2 = 0
 for (let ln of left) {
   if (rightCount[ln]) {
