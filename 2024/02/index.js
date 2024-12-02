@@ -9,14 +9,29 @@ let reports = inputs
   .split('\n')
   .map(nums)
 
-console.log('Part 1')
-let safe = reports.map(diff).filter((diffs) => {
+function isSafe(report) {
+  let diffs = diff(report)
   if (!diffs.every((n) => 3 - Math.abs(n) >= 0)) return false
   if (diffs[0] > 0) return diffs.every((n) => n > 0)
   return diffs.every((n) => n < 0)
-}).length
-console.log('answer:', safe)
+}
+
+console.log('Part 1')
+console.log('answer:', reports.filter(isSafe).length)
 console.log()
 
 console.log('Part 2')
-console.log('answer:')
+let safe = 0
+for (let report of reports) {
+  if (isSafe(report)) {
+    safe++
+  } else {
+    for (let i = 0; i < report.length; i++) {
+      if (isSafe(report.filter((_, index) => index != i))) {
+        safe++
+        break
+      }
+    }
+  }
+}
+console.log('answer:', safe)
