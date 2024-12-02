@@ -1,6 +1,13 @@
 const crypto = require('crypto')
 const util = require('util')
 
+function diff(list) {
+  let result = []
+  for (let i = 1; i < list.length; i++) {
+    result.push(list[i] - list[i - 1])
+  }
+  return result
+}
 /** @type {Record<string, [number, number]>} */
 const dirs = {
   ['^']: [0, -1],
@@ -97,6 +104,13 @@ function getGrid(input) {
       rotate(cols).forEach((row) => console.log(row.join('')))
     },
   })
+}
+
+/**
+ * @param {string} line
+ */
+function nums(line) {
+  return Array.from(line.matchAll(/\d+/g), Number)
 }
 
 /**
@@ -200,9 +214,11 @@ function uniquePairs(list) {
 module.exports = {
   Range,
   add,
+  diff,
   dirs,
   getGrid,
   hash,
+  nums,
   oppositeDirs,
   range,
   rotate,
