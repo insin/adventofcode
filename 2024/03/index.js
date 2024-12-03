@@ -16,15 +16,13 @@ console.log()
 console.log('Part 2')
 let answer2 = 0
 let active = true
-for (let match of program.matchAll(
-  /(mul)\((\d+),(\d+)\)|(do)\(\)|(don't)\(\)/g
-)) {
+for (let match of program.matchAll(/mul\((\d+),(\d+)\)|do\(\)|don't\(\)/g)) {
   if (match[0] == 'do()') {
     active = true
   } else if (match[0] == "don't()") {
     active = false
   } else if (active) {
-    answer2 += Number(match[2]) * Number(match[3])
+    answer2 += Number(match[1]) * Number(match[2])
   }
 }
 console.log('answer:', answer2)
