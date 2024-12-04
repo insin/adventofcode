@@ -38,7 +38,7 @@ function getPossibleMoves(pos, dir, ignoreArrows = false) {
   let possible = []
 
   // If the current space is an arrow we must go in that direction
-  let gridDir = grid.at(pos)
+  let gridDir = grid.get(pos)
   if (!ignoreArrows && dirs[gridDir]) {
     // Unless we came from the opposite direction
     if (gridDir != oppositeDirs[dir]) {
@@ -52,7 +52,7 @@ function getPossibleMoves(pos, dir, ignoreArrows = false) {
       // Not in the map
       if (!grid.contains(nextPos)) continue
       // Can't move through trees
-      if (grid.at(nextPos) == '#') continue
+      if (grid.get(nextPos) == '#') continue
       possible.push([nextPos, nextDir])
     }
   }
@@ -79,12 +79,12 @@ let end = `${grid.width - 2},${grid.height - 1}`
 let junctions = new Set([start, end])
 for (let x = 0; x < grid.width; x++) {
   for (let y = 0; y < grid.height; y++) {
-    if (grid.at([x, y]) == '#') continue
+    if (grid.get([x, y]) == '#') continue
     let possibles = []
     for (let delta of Object.values(dirs)) {
       let pos = add([x, y], delta)
-      if (grid.contains(pos) && grid.at(pos) != '#') {
-        possibles.push(grid.at(pos))
+      if (grid.contains(pos) && grid.get(pos) != '#') {
+        possibles.push(grid.get(pos))
       }
     }
     if (possibles.length > 2) {

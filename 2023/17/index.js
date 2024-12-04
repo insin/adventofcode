@@ -46,8 +46,8 @@ function getHeatLosses(getPossibleDirs) {
     [[0, 1], 'v', 1],
   ]
   let heatLoss = new Map([
-    [key(1, 0, '>', 1), Number(grid.at([1, 0]))],
-    [key(0, 1, 'v', 1), Number(grid.at([0, 1]))],
+    [key(1, 0, '>', 1), Number(grid.get([1, 0]))],
+    [key(0, 1, 'v', 1), Number(grid.get([0, 1]))],
   ])
   while (moves.length > 0) {
     /** @type {Move[]} */
@@ -63,7 +63,7 @@ function getHeatLosses(getPossibleDirs) {
         let nextKey = key(nextX, nextY, nextDir, nextSteps)
         let nextHeatLoss =
           heatLoss.get(key(x, y, dir, stepsInCurrentDirection)) +
-          Number(grid.at([nextX, nextY]))
+          Number(grid.get([nextX, nextY]))
         if (!heatLoss.has(nextKey) || nextHeatLoss < heatLoss.get(nextKey)) {
           heatLoss.set(nextKey, nextHeatLoss)
           nextMoves.push([[nextX, nextY], nextDir, nextSteps])

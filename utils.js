@@ -8,6 +8,19 @@ function diff(list) {
   }
   return result
 }
+
+/** @type {[number, number][]} */
+const deltas = [
+  [-1, -1],
+  [0, -1],
+  [1, -1],
+  [-1, 0],
+  [1, 0],
+  [-1, 1],
+  [0, 1],
+  [1, 1],
+]
+
 /** @type {Record<string, [number, number]>} */
 const dirs = {
   ['^']: [0, -1],
@@ -26,10 +39,11 @@ const oppositeDirs = {
 /**
  * @param {[number, number]} pos
  * @param {[number, number]} delta
+ * @param {number} [times]
  * @returns {[number, number]}
  */
-function add(pos, delta) {
-  return [pos[0] + delta[0], pos[1] + delta[1]]
+function add(pos, delta, times = 1) {
+  return [pos[0] + delta[0] * times, pos[1] + delta[1] * times]
 }
 
 /**
@@ -62,6 +76,16 @@ function getGrid(input) {
   let width = cols.length
   let height = cols[0].length
   return Object.assign(cols, {
+    /**
+     * @returns {Generator<{value: string, pos: [number, number]}>}
+     */
+    [Symbol.iterator]: function* () {
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          yield {value: this.get([x, y]), pos: [x, y]}
+        }
+      }
+    },
     get height() {
       return height
     },
@@ -71,8 +95,8 @@ function getGrid(input) {
     /**
      * @param {[number, number]} pos
      */
-    at([x, y]) {
-      return cols[x][y]
+    get([x, y]) {
+      return this.contains([x, y]) ? cols[x][y] : undefined
     },
     /**
      * @param {[number, number]} pos
@@ -214,6 +238,7 @@ function uniquePairs(list) {
 module.exports = {
   Range,
   add,
+  deltas,
   diff,
   dirs,
   getGrid,

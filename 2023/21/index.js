@@ -30,7 +30,7 @@ function part1() {
       for (let delta of directions) {
         let nextPos = add(pos, delta)
         let key = nextPos.join(',')
-        if (grid.contains(nextPos) && grid.at(nextPos) != '#') {
+        if (grid.contains(nextPos) && grid.get(nextPos) != '#') {
           if (!seen.has(key)) {
             next.push(nextPos)
             seen.add(key)
@@ -71,7 +71,7 @@ function part2() {
               grid.height,
         ]
         let key = nextPos.join(',')
-        if (grid.at(checkPos) != '#') {
+        if (grid.get(checkPos) != '#') {
           if (!seen.has(key)) {
             next.push(nextPos)
             seen.add(key)
