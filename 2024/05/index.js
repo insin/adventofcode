@@ -16,30 +16,43 @@ for (let [n1, n2] of rulesInput.split('\n').map(nums)) {
 }
 let updates = updatesInput.split('\n').map(nums)
 
-console.log('Part 1')
+function isCorrect(update) {
+  let afters = new Set(update.slice(1))
+  let befores = new Set()
+  for (let n of update) {
+    if (
+      (beforeRules.has(n) &&
+        beforeRules.get(n).intersection(befores).size > 0) ||
+      (afterRules.has(n) && afterRules.get(n).intersection(afters).size > 0)
+    )
+      return false
+    befores.add(n)
+    afters.delete(n)
+  }
+  return true
+}
 
+console.log('Part 1')
 console.log(
   'answer:',
   updates
-    .filter((update) => {
-      let afters = new Set(update.slice(1))
-      let befores = new Set()
-      for (let n of update) {
-        if (
-          (beforeRules.has(n) &&
-            beforeRules.get(n).intersection(befores).size > 0) ||
-          (afterRules.has(n) && afterRules.get(n).intersection(afters).size > 0)
-        )
-          return false
-        befores.add(n)
-        afters.delete(n)
-      }
-      return true
-    })
+    .filter(isCorrect)
     .map((update) => update[Math.floor(update.length / 2)])
     .reduce((acc, num) => acc + num, 0)
 )
 console.log()
 
 console.log('Part 2')
-console.log('answer:')
+console.log(
+  'answer:',
+  updates
+    .filter((update) => !isCorrect(update))
+    .map(
+      (update) =>
+        update.sort((a, b) => {
+          if (beforeRules.has(a) && beforeRules.get(a).has(b)) return -1
+          if (afterRules.has(a) && afterRules.get(a).has(b)) return 1
+        })[Math.floor(update.length / 2)]
+    )
+    .reduce((acc, num) => acc + num, 0)
+)
