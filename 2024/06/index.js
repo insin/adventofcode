@@ -16,7 +16,8 @@ const turns = {
 }
 
 console.log('Part 1')
-let pos = grid.findItem('^')
+let initialPos = grid.findItem('^')
+let pos = initialPos
 let dir = '^'
 do {
   let nextPos = add(pos, dirs[dir])
@@ -35,4 +36,30 @@ console.log(
 console.log()
 
 console.log('Part 2')
-console.log('answer:')
+function key(dir, pos) {
+  return [dir, pos].join(',')
+}
+function cycles(grid) {
+  let dir = '^'
+  let pos = initialPos
+  let seen = new Set()
+  while (true) {
+    if (seen.has(key(dir, pos))) return true
+    seen.add(key(dir, pos))
+    let nextPos = add(pos, dirs[dir])
+    if (!grid.contains(nextPos)) return false
+    if (grid.get(nextPos) == '#') {
+      dir = turns[dir]
+    } else {
+      pos = nextPos
+    }
+  }
+}
+let cycleCount = 0
+for (let {pos} of Array.from(grid).filter(({value}) => value == 'X')) {
+  if (String(pos) == String(initialPos)) continue
+  let testGrid = getGrid(inputs.at(process.argv[2] == 'test' ? 0 : -1))
+  testGrid.set('#', pos)
+  if (cycles(testGrid)) cycleCount++
+}
+console.log('answer:', cycleCount)
