@@ -99,6 +99,13 @@ function getGrid(input) {
       return this.contains([x, y]) ? cols[x][y] : undefined
     },
     /**
+     * @param {string} value
+     * @param {[number, number]} pos
+     */
+    set(value, [x, y]) {
+      cols[x][y] = value
+    },
+    /**
      * @param {[number, number]} pos
      */
     contains([x, y]) {
