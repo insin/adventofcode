@@ -9,8 +9,8 @@ let equations = inputs
   .split('\n')
   .map(nums)
 
-console.log('Part 1')
 let ops = [(total, n) => total + n, (total, n) => total * n]
+
 function countPositions(target, totals, rest) {
   let next = rest.shift()
   let nextTotals = totals
@@ -21,15 +21,22 @@ function countPositions(target, totals, rest) {
   }
   return countPositions(target, nextTotals, rest)
 }
-let answer1 = 0
-for (let [target, total, ...rest] of equations) {
-  let positions = countPositions(target, [total], rest)
-  if (positions > 0) {
-    answer1 += target
+
+function solve() {
+  let answer = 0
+  for (let [target, total, ...rest] of equations) {
+    let positions = countPositions(target, [total], rest)
+    if (positions > 0) {
+      answer += target
+    }
   }
+  return answer
 }
-console.log('answer:', answer1)
+
+console.log('Part 1')
+console.log('answer:', solve())
 console.log()
 
 console.log('Part 2')
-console.log('answer:')
+ops.push((total, n) => Number(`${total}${n}`))
+console.log('answer:', solve())
