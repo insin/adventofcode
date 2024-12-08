@@ -36,4 +36,24 @@ console.log(
 console.log()
 
 console.log('Part 2')
+for (let positions of antennas.values()) {
+  for (let [a, b] of uniquePairs(positions)) {
+    let delta = [a[0] - b[0], a[1] - b[1]]
+    let antinode1 = add(a, delta)
+    while (grid.contains(antinode1)) {
+      grid.set('#', antinode1)
+      antinode1 = add(antinode1, delta)
+    }
+    let antinode2 = add(b, delta, -1)
+    while (grid.contains(antinode2)) {
+      grid.set('#', antinode2)
+      antinode2 = add(antinode2, delta, -1)
+    }
+  }
+}
+if (debug) grid.print()
+console.log(
+  'answer:',
+  Array.from(grid).filter(({value}) => value != '.').length
+)
 console.log('answer:')
