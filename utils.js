@@ -10,6 +10,22 @@ function diff(list) {
 }
 
 /** @type {[number, number][]} */
+const diagonalDirs = [
+  [-1, -1],
+  [1, -1],
+  [-1, 1],
+  [1, 1],
+]
+
+/** @type {[number, number][]} */
+const sidewaysDirs = [
+  [0, -1],
+  [1, 0],
+  [0, 1],
+  [-1, 0],
+]
+
+/** @type {[number, number][]} */
 const deltas = [
   [-1, -1],
   [0, -1],
@@ -246,6 +262,7 @@ module.exports = {
   Range,
   add,
   deltas,
+  diagonalDirs,
   diff,
   dirs,
   getGrid,
@@ -254,6 +271,7 @@ module.exports = {
   oppositeDirs,
   range,
   rotate,
+  sidewaysDirs,
   sum,
   uniquePairs,
 }
