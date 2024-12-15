@@ -65,7 +65,7 @@ let boxChars = new Set(['[', ']'])
  * @param {[number, number]} pos
  * @returns {[[number, number], [number, number]]}
  */
-function expandBox(pos) {
+function getBoxPositions(pos) {
   if (map.get(pos) == ']') {
     return [add(pos, dirs['<']), pos]
   } else {
@@ -102,8 +102,8 @@ for (let dir of moves) {
     // Vertical, check all spaces above/below boxes which are moving
     else {
       let move = false
-      let boxesToMove = [[expandBox(nextBotPos)]]
-      let currentBoxes = [expandBox(nextBotPos)]
+      let boxesToMove = [[getBoxPositions(nextBotPos)]]
+      let currentBoxes = [getBoxPositions(nextBotPos)]
       while (true) {
         // If any boxes are moving towards a #, don't move
         if (
@@ -128,13 +128,12 @@ for (let dir of moves) {
         /** @type {[[number, number], [number, number]][]} */
         let nextBoxes = []
         for (let [boxL, boxR] of currentBoxes) {
-          if (map.get(boxL, delta) == '[') {
-            nextBoxes.push([add(boxL, delta), add(boxR, delta)])
-          } else if (map.get(boxL, delta) == ']') {
-            nextBoxes.push(expandBox(add(boxL, delta)))
+          // '[' aligning with '[' also covers ']' aligning with ']'
+          if (boxChars.has(map.get(boxL, delta))) {
+            nextBoxes.push(getBoxPositions(add(boxL, delta)))
           }
           if (map.get(boxR, delta) == '[') {
-            nextBoxes.push(expandBox(add(boxR, delta)))
+            nextBoxes.push(getBoxPositions(add(boxR, delta)))
           }
         }
         boxesToMove.push(nextBoxes)
