@@ -110,15 +110,25 @@ function getGrid(input) {
     },
     /**
      * @param {[number, number]} pos
+     * @param {[number, number]} [delta]
+     * @param {number} [times]
      */
-    get([x, y]) {
+    get([x, y], delta = null, times = 1) {
+      if (delta != null) {
+        ;[x, y] = add([x, y], delta, times)
+      }
       return this.contains([x, y]) ? cols[x][y] : undefined
     },
     /**
      * @param {string} value
      * @param {[number, number]} pos
+     * @param {[number, number]} [delta]
+     * @param {number} [times]
      */
-    set(value, [x, y]) {
+    set(value, [x, y], delta = null, times = 1) {
+      if (delta != null) {
+        ;[x, y] = add([x, y], delta, times)
+      }
       cols[x][y] = value
     },
     /**

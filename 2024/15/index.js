@@ -91,7 +91,7 @@ for (let dir of moves) {
       if (map.get(lastBoxPos) == '.') {
         let oppositeDelta = dirs[oppositeDirs[dir]]
         for (let i = 1; i <= boxesToMove; i++) {
-          map.set(map.get(add(lastBoxPos, oppositeDelta)), lastBoxPos)
+          map.set(map.get(lastBoxPos, oppositeDelta), lastBoxPos)
           lastBoxPos = add(lastBoxPos, oppositeDelta)
         }
         map.set('@', nextBotPos)
@@ -109,8 +109,7 @@ for (let dir of moves) {
         if (
           currentBoxes.some(
             ([boxL, boxR]) =>
-              map.get(add(boxL, delta)) == '#' ||
-              map.get(add(boxR, delta)) == '#'
+              map.get(boxL, delta) == '#' || map.get(boxR, delta) == '#'
           )
         ) {
           break
@@ -119,8 +118,7 @@ for (let dir of moves) {
         if (
           currentBoxes.every(
             ([boxL, boxR]) =>
-              map.get(add(boxL, delta)) == '.' &&
-              map.get(add(boxR, delta)) == '.'
+              map.get(boxL, delta) == '.' && map.get(boxR, delta) == '.'
           )
         ) {
           move = true
@@ -130,12 +128,12 @@ for (let dir of moves) {
         /** @type {[[number, number], [number, number]][]} */
         let nextBoxes = []
         for (let [boxL, boxR] of currentBoxes) {
-          if (map.get(add(boxL, delta)) == '[') {
+          if (map.get(boxL, delta) == '[') {
             nextBoxes.push([add(boxL, delta), add(boxR, delta)])
-          } else if (map.get(add(boxL, delta)) == ']') {
+          } else if (map.get(boxL, delta) == ']') {
             nextBoxes.push(expandBox(add(boxL, delta)))
           }
-          if (map.get(add(boxR, delta)) == '[') {
+          if (map.get(boxR, delta) == '[') {
             nextBoxes.push(expandBox(add(boxR, delta)))
           }
         }
@@ -145,8 +143,8 @@ for (let dir of moves) {
       if (move) {
         for (let boxes of boxesToMove.toReversed()) {
           for (let [boxL, boxR] of boxes) {
-            map.set('[', add(boxL, delta))
-            map.set(']', add(boxR, delta))
+            map.set('[', boxL, delta)
+            map.set(']', boxR, delta)
             map.set('.', boxL)
             map.set('.', boxR)
           }
