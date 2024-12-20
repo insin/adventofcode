@@ -1,12 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 
-let year
-let day
-if (!process.argv[2]) {
-  year = new Date().getFullYear()
-  day = new Date().getDate()
-} else {
+let today = new Date()
+let year = today.getFullYear()
+let day = today.getDate()
+if (process.argv[2]) {
   let match = process.argv[2].match(/^(?:(\d{4})\/)?(\d{1,2})$/)
   if (!match) {
     console.error(
